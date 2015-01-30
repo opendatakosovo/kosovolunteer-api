@@ -30,61 +30,33 @@ def display_events():
 
 @app.route('/create/event', methods=['POST'])
 def create_event():
-    json_doc = {}
 
-    json_string = request.data
-    json_obj = json_util.loads(json_string)
-    json_obj_name_val = json_obj['name']
-    json_obj_description_val = json_obj['description']
-    json_obj_volunteer = json_obj['applicants']
-    json_obj_from_string = json_util.dumps(json_obj)
+    events_json_string = request.data
+    events_json_obj = json_util.loads(events_json_string)
 
-    json_doc={
-        "name": json_obj_name_val,
-        "description": json_obj_description_val,
-        "applicants":json_obj_volunteer
-    }
-
-
-    db.events.insert(json_doc)
+    db.events.insert(events_json_obj)
     
     resp = Response(
         response=json_string,
         mimetype='application/json')
     return resp
-
 
 
 
 @app.route('/register/volunteer', methods=['POST'])
 def register_as_volunteer():
-    json_doc = {}
 
-    json_string = request.data
-    json_obj = json_util.loads(json_string)
-    json_obj_event_name_val = json_obj['eventID']
-    json_obj_name_val = json_obj['name']
-    json_obj_email_val = json_obj['e-mail']
-    json_obj_from_string = json_util.dumps(json_obj)
+    volunteer_json_string = request.data
+    volunteer_json_obj = json_util.loads(volunteer_json_string)
 
-    json_doc={
-        "eventID": json_obj_event_name_val,
-        "name": json_obj_name_val,
-        "e-mail": json_obj_email_val
+    db.volunteers.insert(volunteer_json_obj)
 
-    }
-
-
-    db.applyvolunteer.insert(json_doc)
-
+    #db.events.
     
     resp = Response(
         response=json_string,
         mimetype='application/json')
     return resp
-
-
-
 
 
 @app.route('/display/volunteer', methods=['GET'])
