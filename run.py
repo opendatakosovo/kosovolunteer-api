@@ -1,4 +1,5 @@
 from flask import Flask
+from bson.objectid import ObjectId
 from flask import Response, request, jsonify
 from bson import json_util, SON
 from pymongo import MongoClient
@@ -20,8 +21,6 @@ def index():
 def display_events():
 
     json = db.events.find({}).sort([("_id", -1)])
-
-
     resp = Response(
         response=json_util.dumps(json),
         mimetype='application/json')
@@ -33,9 +32,7 @@ def create_event():
 
     events_json_string = request.data
     events_json_obj = json_util.loads(events_json_string)
-
     db.events.insert(events_json_obj)
-    
     resp = Response(
         response=json_string,
         mimetype='application/json')
@@ -48,36 +45,22 @@ def register_as_volunteer():
 
     volunteer_json_string = request.data
     volunteer_json_obj = json_util.loads(volunteer_json_string)
-
     db.volunteers.insert(volunteer_json_obj)
+    id_of_volunteer = volunteer_json_obj['eventId']
 
-    #db.events.
-    
+    db.events.update(
+        {"_id": ObjectId(id_of_volunteer)},
+        {"$inc":
+            {"applicants.applied": 1}
+        }
+    )   
+
     resp = Response(
-        response=json_string,
+        response=volunteer_json_obj,
         mimetype='application/json')
     return resp
 
 
-@app.route('/display/volunteer', methods=['GET'])
-def display_volunteer():
-
-    json = db.applyvolunteer.aggregate([{"$group":{
-            "_id":{
-                "Id":"$eventID"},
-                "numriVullnetareve":{"$sum":1}
-                    }},
-            {"$project":{
-            "eventId":"$_id.Id",
-            "Numri": "$numriVullnetareve",
-            "_id":0
-
-            }}])
-
-    resp = Response(
-        response=json_util.dumps(json['result']),
-        mimetype='application/json')
-    return resp
 
 if __name__ == '__main__':
 
