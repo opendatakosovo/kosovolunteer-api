@@ -60,6 +60,17 @@ def register_as_volunteer():
         mimetype='application/json')
     return resp
 
+@app.route('/delete/event', methods=['POST'])
+def delete_event():
+    event_json_string = request.data
+
+    db.events.remove(
+        {"_id": ObjectId(event_json_string)}
+    )  
+    resp = Response(
+        response=event_json_string,
+        mimetype='application/json')
+    return resp 
 
 
 if __name__ == '__main__':
