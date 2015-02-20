@@ -34,7 +34,7 @@ def create_event():
     events_json_obj = json_util.loads(events_json_string)
     db.events.insert(events_json_obj)
     resp = Response(
-        response=events_json_obj,
+        response=json_string,
         mimetype='application/json')
     return resp
 
@@ -52,7 +52,8 @@ def register_as_volunteer():
         {"_id": ObjectId(id_of_volunteer)},
         {"$inc":
             {"applicants.applied": 1}
-        }
+        },
+   	{ upsert: true }
     )   
 
     resp = Response(
